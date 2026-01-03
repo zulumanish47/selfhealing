@@ -1,0 +1,17 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# IDE files
+.DS_Store
+.idea/
+*.DotSettings.user
+
+# Runtime configs copied to output
+**/appsetting.json
+
+# VS Test artifacts
+TestResult*/
+
+# Selenium Manager binaries
+**/runtimes/

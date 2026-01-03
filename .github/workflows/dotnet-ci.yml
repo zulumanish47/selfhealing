@@ -1,0 +1,53 @@
+name: .NET CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        working-directory: SeleniumSelfHealingTests
+        run: dotnet restore
+
+      - name: Build
+        working-directory: SeleniumSelfHealingTests
+        run: dotnet build SeleniumSelfHealingTests.sln -c Release --no-restore
+
+      - name: Test (with coverage)
+        working-directory: SeleniumSelfHealingTests
+        run: dotnet test SeleniumSelfHealingTests.sln -c Release --no-build --verbosity normal --logger "trx;LogFileName=TestResults.trx" --collect:"XPlat Code Coverage"
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage HTML
+        working-directory: SeleniumSelfHealingTests
+        shell: pwsh
+        run: |
+          $results = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml" | Select-Object -First 1
+          reportgenerator -reports $results.FullName -targetdir "CoverageReport" -reporttypes Html
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: SeleniumSelfHealingTests/TestResults
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: SeleniumSelfHealingTests/CoverageReport
