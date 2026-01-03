@@ -1,0 +1,37 @@
+{
+  "name": "seleniumselfhealingtests-main",
+  "version": "1.0.0",
+  "description": "TypeScript Playwright test framework with LLM-powered self-healing locators",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zulumanish47/selfhealing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zulumanish47/selfhealing/issues"
+  },
+  "homepage": "https://github.com/zulumanish47/selfhealing#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "zod": "^4.3.4"
+  }
+}

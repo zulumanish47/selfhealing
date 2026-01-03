@@ -1,17 +1,47 @@
-# Build outputs
+# .NET Build outputs
 **/bin/
 **/obj/
+
+# Node.js / TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
 
 # IDE files
 .DS_Store
 .idea/
+.vscode/
 *.DotSettings.user
+*.swp
+*.swo
 
-# Runtime configs copied to output
+# Runtime configs
 **/appsetting.json
 
-# VS Test artifacts
+# Test artifacts
 TestResult*/
 
 # Selenium Manager binaries
 **/runtimes/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Coverage
+coverage/
+*.lcov
+
+# OS
+Thumbs.db

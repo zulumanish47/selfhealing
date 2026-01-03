@@ -1,51 +1,133 @@
-# SeleniumSelfHealingTests
+# Playwright Self-Healing Tests with LLM
 
-A .NET 8 xUnit test project demonstrating self-healing Selenium locators powered by an LLM.
+A TypeScript Playwright test framework featuring LLM-powered self-healing locators. This project automatically recovers from locator failures using a sophisticated 3-tier fallback strategy combined with AI healing.
+
+**Migrated from C# Selenium to TypeScript Playwright**
+
+## Features
+
+- **3-Tier Fallback Strategy**: Primary locator → Alternative strategies → AI-powered healing
+- **Dual LLM Provider Support**: Local Ollama or OpenAI
+- **Playwright Integration**: Modern browser automation with auto-waiting
+- **Page Object Model**: Clean, maintainable test architecture
+- **TypeScript**: Full type safety and IntelliSense support
 
 ## Prerequisites
-- .NET SDK 8.0
-- Google Chrome (Selenium Manager will resolve ChromeDriver automatically)
 
-## Project Structure
-- `Pages/` – Page Objects (`HomePage`, `LoginPage`)
-- `Utilities/Extensions/` – WebDriver async extensions (`AiFindElement`, `Click`, `SendKeys`)
-- `Utilities/LLMs/` – LLM client and self-healing logic
-- `Tests/` – xUnit tests (`EnhancedTests`)
+- Node.js 18.x or higher
+- npm 9.x or higher
+- LLM Provider (Ollama or OpenAI API key)
 
 ## Quick Start
-```powershell
-Push-Location "c:\Users\DELL\Downloads\SeleniumSelfHealingTests\SeleniumSelfHealingTests"
-dotnet restore
-dotnet build SeleniumSelfHealingTests.sln -c Debug
-dotnet test SeleniumSelfHealingTests.sln -c Debug
-Pop-Location
+
+```bash
+# Install dependencies
+npm install
+
+# Install Playwright browsers
+npx playwright install chromium
+
+# Configure LLM (copy and edit .env)
+cp .env.example .env
+
+# Run tests
+npm test
 ```
 
 ## Configuration
-Runtime config `appsetting.json` is copied to output at build time and should contain:
-```json
-{
-  "Provider": "Local", // or "OpenAI"
-  "ApiKey": "YOUR_API_KEY",
-  "BaseUrl": "http://localhost:11434",
-  "Model": "qwen3-coder:480b-cloud",
-  "Temperature": 0.1,
-  "MaxTokens": 1000
-}
-```
-Note: Source `appsetting.json` is excluded from Git, and build outputs (`bin/`, `obj/`) are ignored to avoid committing secrets and heavy artifacts.
 
-## Running Specific Tests
-```powershell
-# Run only EnhancedTests
-Push-Location "c:\Users\DELL\Downloads\SeleniumSelfHealingTests\SeleniumSelfHealingTests"
-dotnet test SeleniumSelfHealingTests.sln -c Debug --filter FullyQualifiedName~EnhancedTests
-Pop-Location
+Edit `.env` file:
+
+### Option 1: Local Ollama (Recommended)
+```env
+LLM_PROVIDER=Local
+LLM_BASE_URL=http://localhost:11434
+LLM_MODEL=qwen3-coder:480b-cloud
+LLM_TEMPERATURE=0.1
+LLM_MAX_TOKENS=1000
 ```
+
+### Option 2: OpenAI
+```env
+LLM_PROVIDER=OpenAI
+LLM_API_KEY=your-openai-api-key-here
+LLM_BASE_URL=https://api.openai.com
+LLM_MODEL=gpt-4
+LLM_TEMPERATURE=0.1
+LLM_MAX_TOKENS=1000
+```
+
+## Project Structure
+
+```
+├── src/
+│   ├── pages/              # Page Object Models
+│   ├── core/               # Self-healing framework
+│   ├── llm/                # LLM integration
+│   ├── models/             # TypeScript interfaces
+│   └── config/             # Configuration loader
+├── tests/                  # Playwright test files
+├── .env.example            # Configuration template
+└── playwright.config.ts    # Playwright configuration
+```
+
+## Usage
+
+### Running Tests
+
+```bash
+npm test              # Run all tests
+npm run test:ui       # Interactive UI mode
+npm run test:headed   # See browser
+npm run test:debug    # Debug mode
+npm run test:report   # View report
+```
+
+### Writing Tests
+
+```typescript
+import { test } from '@playwright/test';
+import { HomePage } from '../src/pages/HomePage';
+
+test('example test', async ({ page }) => {
+  await page.goto('/');
+
+  const homePage = new HomePage(page);
+  await homePage.clickLogin();
+});
+```
+
+## How Self-Healing Works
+
+1. **Primary Strategy**: Tries original locator
+2. **Alternative Strategies**: Tries stored alternatives
+3. **AI Healing**: Sends page source to LLM for new locator suggestions
+
+Example:
+- Test tries `text=Login`
+- Element not found (UI changed to "Sign In")
+- LLM suggests `text=Sign In`, `role=link[name="Sign In"]`
+- Test continues successfully
 
 ## Troubleshooting
-- If push protection blocks commits, ensure no secrets exist in history and that `bin/`/`obj/` are ignored.
-- If ChromeDriver issues occur, update Chrome or ensure Selenium.WebDriver is current.
+
+### LLM Connection Issues
+- **Ollama**: Ensure `ollama serve` is running
+- **OpenAI**: Verify API key in `.env`
+
+### Configuration Errors
+Ensure `.env` has all required fields:
+- `LLM_PROVIDER` (must be "Local" or "OpenAI")
+- `LLM_BASE_URL` (must be valid URL)
+- `LLM_MODEL`
+- `LLM_TEMPERATURE`
+- `LLM_MAX_TOKENS`
+
+### AI Healing Not Working
+- Check console for healing messages
+- Verify page source contains target element
+- Try different LLM model
 
 ## License
-This repository contains demo code for testing purposes.
+
+ISC
